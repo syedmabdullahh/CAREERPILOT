@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: careerpilot-api
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=True
+      - LLM_PROVIDER=qwen
+      - LLM_MODEL=qwen2.5:7b
+    volumes:
+      - ./backend:/app/backend
+      - ./storage:/app/storage
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: careerpilot-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - .:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+    restart: unless-stopped
